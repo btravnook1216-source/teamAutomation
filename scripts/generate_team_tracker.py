@@ -107,11 +107,19 @@ def generate(
     monthly_target: float,
     team_lead: str,
     output: Path,
+    team_target: float | None = None,
 ):
     weeks = build_weeks(year, month)
     working_days = sum(len(w) for w in weeks)
     n_agents = len(agents)
     month_name = datetime.date(year, month, 1).strftime("%B").upper()
+
+    # Team target is a business goal set independently of the sum of
+    # individual agent base targets (e.g. it needn't equal n_agents x
+    # monthly_target — a team lead with no personal quota, part-timers,
+    # or a negotiated stretch/buffer goal all break that equality).
+    combined_agent_targets = monthly_target * n_agents
+    team_target_value = team_target if team_target is not None else combined_agent_targets
 
     # ---- column layout for the Weekly Tracker sheet ----
     col = 4  # A=agent, B=daily target, C=monthly target
@@ -139,6 +147,7 @@ def generate(
     checkpoint_days = sum(len(weeks[i]) for i in checkpoint_idx)
     checkpoint_end = weeks[checkpoint_idx[-1]][-1]
     checkpoint_target = round(monthly_target * checkpoint_days / working_days)
+    checkpoint_team_target = round(team_target_value * checkpoint_days / working_days)
 
     wb = Workbook()
 
@@ -160,17 +169,18 @@ def generate(
     wt.merge_cells(start_row=2, start_column=1, end_row=2, end_column=last_col)
     c = wt.cell(
         2, 1,
-        f"Team Lead: {team_lead}   |   Monthly Target: AED {monthly_target:,.0f} per agent   "
-        f"|   Working Days: {working_days}   |   \U0001F7E1 Yellow cells = daily data entry",
+        f"Team Lead: {team_lead}   |   Team Target: AED {team_target_value:,.0f}   |   "
+        f"Per-Agent Base Target: AED {monthly_target:,.0f}   |   Working Days: {working_days}   |   "
+        f"\U0001F7E1 Yellow cells = daily data entry",
     )
     c.font = Font(name=FONT_NAME, size=9, color=NAVY)
 
     wt.merge_cells(start_row=3, start_column=1, end_row=3, end_column=last_col)
     c = wt.cell(
         3, 1,
-        f"⚠️  Mid-month checkpoint: be at AED {checkpoint_target:,.0f} per agent "
-        f"(AED {checkpoint_target * n_agents:,.0f} team) by {checkpoint_end.strftime('%d %b')} "
-        f"/ end of WK {checkpoint_idx[-1] + 1} to avoid a month-end rush.",
+        f"⚠️  Mid-month checkpoint: each agent aim AED {checkpoint_target:,.0f} (base-target pacing)   "
+        f"|   Team aim AED {checkpoint_team_target:,.0f} against the AED {team_target_value:,.0f} team target   "
+        f"by {checkpoint_end.strftime('%d %b')} / end of WK {checkpoint_idx[-1] + 1}.",
     )
     c.font = Font(name=FONT_NAME, size=9, bold=True, color=WARN_RED)
 
@@ -291,12 +301,11 @@ def generate(
     achieved_terms = "+".join(
         f"{get_column_letter(week_cols[i][2])}{total_row}" for i in checkpoint_idx
     )
-    target_terms = checkpoint_target * n_agents
     wt.merge_cells(start_row=note_row, start_column=4, end_row=note_row, end_column=last_col)
     c = wt.cell(
         note_row, 4,
-        f'="Team actual: AED "&TEXT({achieved_terms},"#,##0")&"   |   Aim: AED {target_terms:,.0f} '
-        f'team (AED {checkpoint_target:,.0f}/agent)"',
+        f'="Team actual: AED "&TEXT({achieved_terms},"#,##0")&"   |   Aim: AED {checkpoint_team_target:,.0f} '
+        f'team (against AED {team_target_value:,.0f} team target)"',
     )
     c.font = Font(name=FONT_NAME, size=9, bold=True, color=WARN_RED)
 
@@ -315,9 +324,9 @@ def generate(
     db.merge_cells("A2:H2")
     c = db.cell(
         2, 1,
-        f"Team Lead: {team_lead}   |   Monthly Target: AED {monthly_target:,.0f} per agent   "
-        f"|   Working Days: {working_days}   |   Mid-Month Checkpoint (by {checkpoint_end.strftime('%d %b')}): "
-        f"AED {checkpoint_target:,.0f} per agent",
+        f"Team Lead: {team_lead}   |   Team Target: AED {team_target_value:,.0f}   |   "
+        f"Per-Agent Base Target: AED {monthly_target:,.0f}   |   Working Days: {working_days}   |   "
+        f"Mid-Month Checkpoint (by {checkpoint_end.strftime('%d %b')}): AED {checkpoint_team_target:,.0f} team",
     )
     c.font = Font(name=FONT_NAME, size=9, color=NAVY)
 
@@ -336,18 +345,17 @@ def generate(
     achieved_terms_dash = "+".join(
         f"'Weekly Tracker'!{get_column_letter(week_cols[i][2])}{total_row}" for i in checkpoint_idx
     )
-    target_terms_dash = "+".join(
-        f"'Weekly Tracker'!{get_column_letter(week_cols[i][0])}{total_row}" for i in checkpoint_idx
-    )
-    db.cell(6, 1, f"='Weekly Tracker'!C{total_row}")
+    a6 = db.cell(6, 1, team_target_value)
+    a6.font = Font(name=FONT_NAME, size=9, color=INPUT_BLUE_FONT)
+    a6.alignment = Alignment(horizontal="center", vertical="center")
     db.cell(6, 2, f"='Weekly Tracker'!{ma_letter}{total_row}")
     db.cell(6, 3, "=A6-B6")
     db.cell(6, 4, "=IFERROR(B6/A6,0)")
-    db.cell(6, 5, "=" + target_terms_dash)
+    db.cell(6, 5, f"=ROUND(A6*{checkpoint_days}/{working_days},0)")
     db.cell(6, 6, "=" + achieved_terms_dash)
     db.cell(6, 7, f"=ROUND(A6/{working_days},0)")
     db.cell(6, 8, "=" + STATUS_FORMULA.format(pct="D6"))
-    for i in range(1, 9):
+    for i in range(2, 9):
         style_body(db.cell(6, i))
 
     db.merge_cells("A8:H8")
@@ -388,8 +396,10 @@ def generate(
     db.merge_cells(start_row=footer_row, start_column=1, end_row=footer_row, end_column=8)
     c = db.cell(
         footer_row, 1,
-        f"ℹ️  Each agent's monthly target is a flat AED {monthly_target:,.0f} "
-        f"({n_agents} agents × {monthly_target:,.0f} = AED {monthly_target * n_agents:,.0f} team target). "
+        f"ℹ️  Each agent's base target is a flat AED {monthly_target:,.0f} "
+        f"({n_agents} agents × {monthly_target:,.0f} = AED {combined_agent_targets:,.0f} combined individual "
+        f"targets). The team target (cell A6, AED {team_target_value:,.0f}) is set independently as the overall "
+        f"business goal, so it need not equal the combined individual targets. "
         f"Yellow cells on 'Weekly Tracker' = daily entry; everything else here updates automatically.",
     )
     c.font = Font(name=FONT_NAME, size=9, color=GRAY)
@@ -413,7 +423,12 @@ def parse_args():
     p.add_argument("--year", type=int, required=True)
     p.add_argument("--month", type=int, required=True)
     p.add_argument("--agents", type=str, required=True, help="Comma-separated agent names")
-    p.add_argument("--target", type=float, required=True, help="Flat monthly target per agent (AED)")
+    p.add_argument("--target", type=float, required=True, help="Flat base monthly target per agent (AED)")
+    p.add_argument(
+        "--team-target", type=float, default=None,
+        help="Overall team target (AED). Defaults to agents x --target if omitted; "
+             "pass this when the business goal isn't a clean multiple of the per-agent base target.",
+    )
     p.add_argument("--team-lead", type=str, required=True)
     p.add_argument("--output", type=Path, required=True)
     return p.parse_args()
@@ -422,4 +437,4 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     agents = [a.strip() for a in args.agents.split(",") if a.strip()]
-    generate(args.year, args.month, agents, args.target, args.team_lead, args.output)
+    generate(args.year, args.month, agents, args.target, args.team_lead, args.output, team_target=args.team_target)
