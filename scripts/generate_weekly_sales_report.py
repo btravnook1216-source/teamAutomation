@@ -2,12 +2,16 @@
 """
 Generate a Travnook Weekly Sales Report from per-agent weekly totals
 (e.g. pulled from the live team dashboard). Computes team/individual
-targets from the CLAUDE.md base target and working-day assumptions,
-classifies each agent GREEN/YELLOW/RED, and flags who needs attention.
+weekly targets from each agent's own monthly target and the working-day
+assumptions, classifies each agent GREEN/YELLOW/RED, and flags who needs
+attention. Supports per-agent monthly targets that differ from the default
+(e.g. an agent on a reduced quota).
 
 Usage:
     python3 generate_weekly_sales_report.py \
         --data "Harinder:12494,Ibrahim:11353,Layan (ATL):8600,Chaima:8041,Rihab:5874,Khosema:2550,Saha:2070,Alshima:0" \
+        --default-target 25000 \
+        --target-override "Layan (ATL):20000,Chaima:20000" \
         --week-ending 2026-09-12 \
         --output trackers/reports/WEEKLY_SALES_REPORT_2026-09-12.xlsx
 """
@@ -28,7 +32,6 @@ YELLOW_FILL = "FFFFEB9C"
 RED_FILL = "FFFFC7CE"
 FONT_NAME = "Arial"
 
-MONTHLY_TARGET_PER_AGENT = 25000
 WORKING_DAYS = 26
 DAYS_PER_WEEK = 6  # Mon-Sat
 
@@ -56,10 +59,17 @@ def style_body(cell, bold=False, center=True):
         cell.alignment = Alignment(horizontal="center", vertical="center")
 
 
-def generate(agents: list[tuple[str, float]], week_ending: str, output: Path):
+def generate(agents: list[tuple[str, float, float]], week_ending: str, default_target: float, output: Path):
+    # agents: (name, achieved, monthly_target)
     n_agents = len(agents)
-    per_agent_weekly_target = round(MONTHLY_TARGET_PER_AGENT / WORKING_DAYS * DAYS_PER_WEEK)
-    team_weekly_target = per_agent_weekly_target * n_agents
+    weekly_targets = {
+        name: round(monthly_target / WORKING_DAYS * DAYS_PER_WEEK)
+        for name, _, monthly_target in agents
+    }
+    team_weekly_target = sum(weekly_targets.values())
+    overrides = [
+        f"{name} AED {mt:,.0f}/mo" for name, _, mt in agents if mt != default_target
+    ]
 
     wb = Workbook()
     ws = wb.active
@@ -72,12 +82,13 @@ def generate(agents: list[tuple[str, float]], week_ending: str, output: Path):
     c.fill = PatternFill("solid", fgColor=NAVY)
     ws.row_dimensions[1].height = 25.5
 
+    override_note = f"   |   Override: {', '.join(overrides)}" if overrides else ""
     ws.merge_cells("A2:F2")
     c = ws.cell(
         2, 1,
         f"Week Ending: {week_ending}   |   Team Lead: Bindhi   |   "
-        f"Per-Agent Weekly Target: AED {per_agent_weekly_target:,.0f} (base AED {MONTHLY_TARGET_PER_AGENT:,.0f}/mo "
-        f"÷ {WORKING_DAYS} working days × {DAYS_PER_WEEK})",
+        f"Default Monthly Target: AED {default_target:,.0f}/agent"
+        f"{override_note}",
     )
     c.font = Font(name=FONT_NAME, size=9, color=NAVY)
 
@@ -114,10 +125,11 @@ def generate(agents: list[tuple[str, float]], week_ending: str, output: Path):
     for i, h in enumerate(ag_headers, start=1):
         style_header(ws.cell(9, i, h))
 
-    for i, (name, amount) in enumerate(agents):
+    for i, (name, amount, monthly_target) in enumerate(agents):
         row = first_row + i
+        wt = weekly_targets[name]
         style_body(ws.cell(row, 1, name), center=False)
-        ws.cell(row, 2, per_agent_weekly_target)
+        ws.cell(row, 2, wt)
         ws.cell(row, 3, amount)
         ws.cell(row, 4, f"=B{row}-C{row}")
         ws.cell(row, 5, f"=IFERROR(C{row}/B{row},0)")
@@ -127,7 +139,7 @@ def generate(agents: list[tuple[str, float]], week_ending: str, output: Path):
             style_body(ws.cell(row, cc))
         # conditional fill based on % achieved (computed here since openpyxl formula
         # results aren't known at write time)
-        pct = amount / per_agent_weekly_target if per_agent_weekly_target else 0
+        pct = amount / wt if wt else 0
         fill = GREEN_FILL if pct >= 1 else YELLOW_FILL if pct >= 0.7 else RED_FILL
         ws.cell(row, 6).fill = PatternFill("solid", fgColor=fill)
 
@@ -143,7 +155,7 @@ def generate(agents: list[tuple[str, float]], week_ending: str, output: Path):
 
     footer_row = total_row + 2
     ws.merge_cells(start_row=footer_row, start_column=1, end_row=footer_row, end_column=6)
-    below_target = [name for name, amount in agents if amount / per_agent_weekly_target < 0.7]
+    below_target = [name for name, amount, _ in agents if amount / weekly_targets[name] < 0.7]
     flag_text = (
         f"⚠️ Needs attention (below 70% of weekly target): {', '.join(below_target)}."
         if below_target else "All agents at or above 70% of weekly target."
@@ -160,9 +172,25 @@ def generate(agents: list[tuple[str, float]], week_ending: str, output: Path):
     print(f"Wrote {output}")
 
 
+def parse_pairs(s: str) -> dict[str, float]:
+    result = {}
+    for item in s.split(","):
+        item = item.strip()
+        if not item:
+            continue
+        name, value = item.rsplit(":", 1)
+        result[name.strip()] = float(value.strip())
+    return result
+
+
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--data", type=str, required=True, help='Comma-separated "Agent:Amount" pairs')
+    p.add_argument("--data", type=str, required=True, help='Comma-separated "Agent:Achieved" pairs')
+    p.add_argument("--default-target", type=float, required=True, help="Default monthly target per agent (AED)")
+    p.add_argument(
+        "--target-override", type=str, default="",
+        help='Comma-separated "Agent:MonthlyTarget" pairs for agents whose target differs from --default-target',
+    )
     p.add_argument("--week-ending", type=str, required=True)
     p.add_argument("--output", type=Path, required=True)
     return p.parse_args()
@@ -170,8 +198,10 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    pairs = []
-    for item in args.data.split(","):
-        name, amount = item.rsplit(":", 1)
-        pairs.append((name.strip(), float(amount.strip())))
-    generate(pairs, args.week_ending, args.output)
+    achieved = parse_pairs(args.data)
+    overrides = parse_pairs(args.target_override) if args.target_override else {}
+    triples = [
+        (name, amount, overrides.get(name, args.default_target))
+        for name, amount in achieved.items()
+    ]
+    generate(triples, args.week_ending, args.default_target, args.output)
