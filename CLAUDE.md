@@ -80,23 +80,23 @@ Current team size:
 
 Current individual target:
 
-AED 25,000 per agent.
+AED 25,000 per agent, except Layan and Chaima at AED 20,000 (per-agent override, confirmed by Bindhi).
 
 Current team target:
 
-AED 200,000.
+AED 170,000 — confirmed live from https://travnooker.com/portal/sales-report (screenshot, 15 Sep 2026). This is a business goal set independently of the sum of individual agent targets (8 agents at 25k/20k sums to AED 190,000) — the two numbers are not meant to match, and neither should be "corrected" to equal the other.
 
 Current working period:
 
-26 working days / approximately 4 weeks.
+26 working days / approximately 4 weeks. Working weeks in the current month (Sep 2026) are not uniform 6-day blocks — the first and last weeks of a month can be shorter depending on which weekday the month starts/ends on. Always compute per-week targets from actual working days in that week, not a flat 6-day assumption.
 
 Weekly team target:
 
-Approximately AED 46,000.
+Not a fixed number — varies with each week's actual working-day count. At 170,000/26 working days = AED 6,538/working day; multiply by that week's working-day count for the week's target.
 
 Daily team target:
 
-Approximately AED 7,600.
+AED 6,538 (170,000 ÷ 26 working days).
 
 The objective is to reach approximately 80–90% of the monthly target before the final week whenever possible, then close the remaining gap aggressively.
 
