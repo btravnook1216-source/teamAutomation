@@ -239,12 +239,30 @@ def fill_form3(week, data):
                       ('grey_contacted', (270.4, 559.9, 346.9, 578.6)), ('grey_replied', (374.6, 559.9, 451.1, 578.6)), ('grey_converted', (478.9, 559.9, 556.1, 578.6))):
         put(p, rect, f3.get(key), size=10)
     for i, ytxt in enumerate(f3.get('top_actions', [])[:3]):
-        line_text(p, 40, 566, (648.8, 668.2, 687.8)[i], ytxt, 9)
-    sfx = '_DRAFT' if wk.get('status', 'draft') == 'draft' else ''
-    out = os.path.join(ROOT, 'reports', 'weekly', f'Form3_Weekly_Report_Week{week}{sfx}.pdf')
+        y = (648.8, 668.2, 687.8)[i]
+        if text_width(ytxt, 9) <= 526 - 6:
+            line_text(p, 40, 566, y, ytxt, 9)
+        else:  # long action: wrap onto two lines between the previous underline and this one
+            sz = 8.2
+            while sz >= 6:
+                words, lines, cur = ytxt.split(), [], ''
+                for wd in words:
+                    t = (cur + ' ' + wd).strip()
+                    if text_width(t, sz) <= 520:
+                        cur = t
+                    else:
+                        lines.append(cur); cur = wd
+                lines.append(cur)
+                if len(lines) <= 2:
+                    break
+                sz -= 0.2
+            for k, ln in enumerate(lines):
+                p.insert_text((42, y - 10.8 + k * 9.6 - (0 if len(lines) == 2 else 5)), ln, fontsize=sz, fontname='helv', color=INK)
+    out = os.path.join(ROOT, 'reports', 'weekly', f'Form3_Weekly_Report_Week{week}{"_DRAFT" if wk.get("form3_status", wk.get("status", "draft")) == "draft" else ""}.pdf')
     os.makedirs(os.path.dirname(out), exist_ok=True)
     doc.save(out)
     return out
+
 
 
 def combine(data):

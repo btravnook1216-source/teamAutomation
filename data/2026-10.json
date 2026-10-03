@@ -115,7 +115,7 @@
         "team_leader": "Bindhya",
         "team": "Team Bindhya",
         "team_target": 20000,
-        "team_achieved": 20036,
+        "team_achieved": 21186,
         "agent_targets": {
           "Alshima": 2777.7778,
           "Chaima": 2777.7778,
@@ -137,12 +137,18 @@
           "Saha": 5632
         },
         "top_actions": [
-          "Alshima and Khozema (AED 0): reach AED 9,000 each by Sat 10 Oct, i.e. AED 1,500 a day; daily check-in",
-          "Chaima, Harinder, Ibrahim, Rihab: reach AED 8,333 each by Sat 10 Oct (gap 6,083 / 5,591 / 7,183 / 7,237)",
-          "Escalate red dot / Mona redirects to manager; Layan (+1,167) and Saha (+2,701) to stay on AED 8,333 pace"
-        ]
+          "Alshima and Khozema (AED 0): reach AED 9,000 each by Sat 10 Oct. AED 1,500 a day; daily check-in",
+          "Chaima, Harinder, Ibrahim, Rihab: reach AED 8,333-9,000 each by Sat 10 Oct (gap 6,083 / 5,591 / 7,183 / 7,237)",
+          "Escalate the technical issues and get more quality leads / work on potential cases and guide them to close it. Layan (+1,167) and Saha (+2,701) to stay on AED 8,333 pace"
+        ],
+        "open_now": 2,
+        "expected_next_week": 2,
+        "grey_contacted": 0,
+        "grey_replied": 0,
+        "grey_converted": 0
       },
-      "status": "draft"
+      "status": "draft",
+      "form3_status": "final"
     }
   }
 }
