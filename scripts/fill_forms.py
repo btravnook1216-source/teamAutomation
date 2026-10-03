@@ -9,6 +9,7 @@ so the layout stays exactly as the company forms.
   python3 scripts/fill_forms.py form3 1              -> reports/weekly/Form3_Weekly_Report_Week1.pdf
   python3 scripts/fill_forms.py week 1               -> Form 2 + Form 3 for the week
   python3 scripts/fill_forms.py day-all              -> Form 1 for every day in the data file
+  python3 scripts/fill_forms.py combine              -> reports/Travnook_All_Reports_Oct2026.pdf (every report, with bookmarks)
 """
 import datetime as dt
 import json
@@ -241,6 +242,33 @@ def fill_form3(week, data):
     return out
 
 
+def combine(data):
+    """One PDF with every report, with bookmarks, so everything can be checked in one place."""
+    out = pymupdf.open()
+    toc = []
+    days = sorted(data['days'])
+    if days:
+        toc.append([1, 'Form 1 - Daily Reports', out.page_count + 1])
+        for d in days:
+            path = fill_form1(d, data)
+            toc.append([2, fmt_date(d), out.page_count + 1])
+            out.insert_pdf(pymupdf.open(path))
+    for w in sorted(data['weeks'], key=int):
+        wk = data['weeks'][w]
+        tag = ' (DRAFT)' if wk.get('status', 'draft') == 'draft' else ''
+        span = f"{fmt_date(wk['from'], 'short')} to {fmt_date(wk['to'])}"
+        toc.append([1, f'Form 2 - Case Log, Week {w} ({span}){tag}', out.page_count + 1])
+        out.insert_pdf(pymupdf.open(fill_form2(int(w), data)))
+        toc.append([1, f'Form 3 - Weekly Report, Week {w} ({span}){tag}', out.page_count + 1])
+        out.insert_pdf(pymupdf.open(fill_form3(int(w), data)))
+    for rv in data.get('monthly_reviews', []):
+        pass
+    out.set_toc(toc)
+    path = os.path.join(ROOT, 'reports', 'Travnook_All_Reports_Oct2026.pdf')
+    out.save(path)
+    return path
+
+
 if __name__ == '__main__':
     data = load()
     cmd = sys.argv[1]
@@ -252,6 +280,8 @@ if __name__ == '__main__':
         print(fill_form3(int(sys.argv[2]), data))
     elif cmd == 'week':
         print(fill_form2(int(sys.argv[2]), data)); print(fill_form3(int(sys.argv[2]), data))
+    elif cmd == 'combine':
+        print(combine(data))
     elif cmd == 'day-all':
         for d in sorted(data['days']):
             print(fill_form1(d, data))

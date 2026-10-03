@@ -1,17 +1,36 @@
 {
   "team_leader": "Bindhya TB",
   "team": "Tourism & Business",
-  "agents": ["Alshima", "Chaima", "Harinder", "Ibrahim", "Khozema", "Layan", "Rihab", "Saha"],
+  "agents": [
+    "Alshima",
+    "Chaima",
+    "Harinder",
+    "Ibrahim",
+    "Khozema",
+    "Layan",
+    "Rihab",
+    "Saha"
+  ],
   "days": {
     "2026-10-01": {
       "chats_reviewed": 4,
       "chats_with_issues": "",
       "chats_issue_note": "Technical issue: Instagram and TikTok leads are not counted as contact numbers; advertising leads - no potential leads.",
-      "meetings_held": 2, "meetings_with": ["Khozema", "Harinder"],
-      "agents_absent": 1, "absent_names": ["Chaima"],
+      "meetings_held": 2,
+      "meetings_with": [
+        "Khozema",
+        "Harinder"
+      ],
+      "agents_absent": 1,
+      "absent_names": [
+        "Chaima"
+      ],
       "white_phone_holder": "Not with us today",
       "white_phone_calls": 0,
-      "lost_deals": 12, "refunds": 0, "complaints": 0, "discounts": 0,
+      "lost_deals": 12,
+      "refunds": 0,
+      "complaints": 0,
+      "discounts": 0,
       "system_issues": "Yes",
       "urgent": []
     },
@@ -19,11 +38,21 @@
       "chats_reviewed": 8,
       "chats_with_issues": 6,
       "chats_issue_note": "Many chats redirected, mostly from Mona (already responded to earlier, then redirected to agents). On most redirected leads the agent cannot send a message - red dot appearing.",
-      "meetings_held": 2, "meetings_with": ["Khozema", "Alshima"],
-      "agents_absent": 1, "absent_names": ["Rihab"],
+      "meetings_held": 2,
+      "meetings_with": [
+        "Khozema",
+        "Alshima"
+      ],
+      "agents_absent": 1,
+      "absent_names": [
+        "Rihab"
+      ],
       "white_phone_holder": "Ibrahim and Layan",
       "white_phone_calls": "5-6",
-      "lost_deals": 9, "refunds": 0, "complaints": 0, "discounts": 0,
+      "lost_deals": 9,
+      "refunds": 0,
+      "complaints": 0,
+      "discounts": 0,
       "system_issues": 0,
       "urgent": []
     }
@@ -31,28 +60,59 @@
   "sales": {},
   "weeks": {
     "1": {
-      "from": "2026-10-01", "to": "2026-10-03",
+      "from": "2026-10-01",
+      "to": "2026-10-03",
       "logs": {
         "chat_issues": [
-          {"date": "2026-10-01", "feedback": "Technical issue: Instagram and TikTok leads not counted as contact numbers; advertising leads - no potential leads."},
-          {"date": "2026-10-02", "feedback": "Many chats redirected, mostly from Mona (already responded to earlier, then redirected to agents). On most redirected leads the agent cannot send a message - red dot appearing."}
+          {
+            "date": "2026-10-01",
+            "feedback": "Technical issue: Instagram and TikTok leads not counted as contact numbers; advertising leads - no potential leads."
+          },
+          {
+            "date": "2026-10-02",
+            "feedback": "Many chats redirected, mostly from Mona (already responded to earlier, then redirected to agents). On most redirected leads the agent cannot send a message - red dot appearing."
+          }
         ],
         "one_to_one": [
-          {"date": "2026-10-01", "agent": "Khozema"},
-          {"date": "2026-10-01", "agent": "Harinder"},
-          {"date": "2026-10-02", "agent": "Khozema"},
-          {"date": "2026-10-02", "agent": "Alshima"}
+          {
+            "date": "2026-10-01",
+            "agent": "Khozema"
+          },
+          {
+            "date": "2026-10-01",
+            "agent": "Harinder"
+          },
+          {
+            "date": "2026-10-02",
+            "agent": "Khozema"
+          },
+          {
+            "date": "2026-10-02",
+            "agent": "Alshima"
+          }
         ],
         "system_issues": [
-          {"date": "2026-10-01", "what": "Technical and network issues. Instagram and TikTok leads not captured as contact numbers."}
+          {
+            "date": "2026-10-01",
+            "what": "Technical and network issues. Instagram and TikTok leads not captured as contact numbers."
+          }
         ],
         "white_phone": [
-          {"date": "2026-10-01", "holder": "Not with us today", "calls": 0},
-          {"date": "2026-10-02", "holder": "Ibrahim and Layan", "calls": "5-6"}
+          {
+            "date": "2026-10-01",
+            "holder": "Not with us today",
+            "calls": 0
+          },
+          {
+            "date": "2026-10-02",
+            "holder": "Ibrahim and Layan",
+            "calls": "5-6"
+          }
         ]
       },
       "summary": {},
-      "form3": {}
+      "form3": {},
+      "status": "draft"
     }
   }
 }
