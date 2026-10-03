@@ -1,6 +1,6 @@
 {
-  "team_leader": "Bindhya TB",
-  "team": "Tourism & Business",
+  "team_leader": "Bindhya",
+  "team": "Team Bindhya",
   "agents": [
     "Alshima",
     "Chaima",
@@ -55,6 +55,30 @@
       "discounts": 0,
       "system_issues": 0,
       "urgent": []
+    },
+    "2026-10-03": {
+      "chats_reviewed": 9,
+      "chats_with_issues": 3,
+      "chats_issue_note": "",
+      "meetings_held": 2,
+      "meetings_with": [
+        "Khozema",
+        "Harinder"
+      ],
+      "agents_absent": 0,
+      "absent_names": [],
+      "white_phone_holder": "No",
+      "white_phone_calls": 0,
+      "lost_deals": null,
+      "lost_deals_display": "Most - junk leads",
+      "lost_note": "Most of them junk leads. Redirected leads from Moana to Saha and Khozema.",
+      "refunds": 0,
+      "complaints": null,
+      "discounts": 0,
+      "system_issues": 1,
+      "system_issues_display": "CRM issue",
+      "system_note": "CRM issue: old leads redirecting to agents.",
+      "urgent": []
     }
   },
   "sales": {},
@@ -89,12 +113,25 @@
           {
             "date": "2026-10-02",
             "agent": "Alshima"
+          },
+          {
+            "date": "2026-10-03",
+            "agent": "Khozema"
+          },
+          {
+            "date": "2026-10-03",
+            "agent": "Harinder"
           }
         ],
         "system_issues": [
           {
             "date": "2026-10-01",
             "what": "Technical and network issues. Instagram and TikTok leads not captured as contact numbers."
+          },
+          {
+            "date": "2026-10-03",
+            "system": "CRM",
+            "what": "CRM issue: old leads redirecting to agents."
           }
         ],
         "white_phone": [
@@ -107,6 +144,17 @@
             "date": "2026-10-02",
             "holder": "Ibrahim and Layan",
             "calls": "5-6"
+          },
+          {
+            "date": "2026-10-03",
+            "holder": "No",
+            "calls": 0
+          }
+        ],
+        "lost_deals": [
+          {
+            "date": "2026-10-03",
+            "comment": "Most of them junk leads. Redirected leads from Moana to Saha and Khozema."
           }
         ]
       },

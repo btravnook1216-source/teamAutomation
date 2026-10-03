@@ -97,13 +97,13 @@ def fill_form1(day, data):
     c2 = rec.get('chats_with_issues')
     note = rec.get('chats_issue_note', '')
     t2 = (f'{c2} - {note}' if c2 not in (None, '') else note) if note else (c2 if c2 not in (None, '') else '')
-    put(p, F1_BOX[2], t2, size=9, minsize=4.8)
+    put(p, F1_BOX[2] if len(str(t2)) > 60 else (312, 232, 556, 254), t2, size=9, minsize=4.8)
     put(p, F1_BOX[3], names_text(rec.get('meetings_held'), rec.get('meetings_with')), size=9)
     put(p, F1_BOX[4], names_text(rec.get('agents_absent'), rec.get('absent_names')), size=9)
     line_text(p, 311, 420, 363, rec.get('white_phone_holder', ''), 8.5)
     put(p, F1_BOX[6], rec.get('white_phone_calls'), size=10)
     for k, key in ((7, 'lost_deals'), (8, 'refunds'), (9, 'complaints'), (10, 'discounts'), (11, 'system_issues')):
-        put(p, F1_BOX[k], rec.get(key), size=10)
+        put(p, F1_BOX[k], rec.get(key + '_display', rec.get(key)), size=10 if key + '_display' not in rec else 7.5)
     for i, txt in enumerate(rec.get('urgent', [])[:3]):
         line_text(p, 30, 566, F1_URGENT_Y[i] + 0, txt, 9)
     out = os.path.join(ROOT, 'reports', 'daily', f'Form1_Daily_Report_{day}.pdf')
