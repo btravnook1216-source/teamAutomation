@@ -158,7 +158,17 @@
           }
         ]
       },
-      "summary": {},
+      "summary": {
+        "meetings": 6,
+        "refunds_number": 0,
+        "refunds_total": 0,
+        "complaints_number": 0,
+        "complaints_open": 0,
+        "discounts_number": 0,
+        "discounts_approved": 0,
+        "system_number": 2,
+        "white_phone_calls": "5-6"
+      },
       "form3": {
         "team_leader": "Bindhya",
         "team": "Team Bindhya",
