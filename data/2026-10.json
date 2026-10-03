@@ -73,7 +73,7 @@
       "lost_deals_display": "Most - junk leads",
       "lost_note": "Most of them junk leads. Redirected leads from Moana to Saha and Khozema.",
       "refunds": 0,
-      "complaints": null,
+      "complaints": 0,
       "discounts": 0,
       "system_issues": 1,
       "system_issues_display": "CRM issue",
