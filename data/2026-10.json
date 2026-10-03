@@ -117,14 +117,14 @@
         "team_target": 20000,
         "team_achieved": 20036,
         "agent_targets": {
-          "Alshima": 3000,
-          "Chaima": 3000,
-          "Harinder": 3000,
-          "Ibrahim": 3000,
-          "Khozema": 3000,
-          "Layan": 3000,
-          "Rihab": 3000,
-          "Saha": 3000
+          "Alshima": 2777.7778,
+          "Chaima": 2777.7778,
+          "Harinder": 2777.7778,
+          "Ibrahim": 2777.7778,
+          "Khozema": 2777.7778,
+          "Layan": 2777.7778,
+          "Rihab": 2777.7778,
+          "Saha": 2777.7778
         },
         "agent_achieved": {
           "Alshima": 0,
@@ -137,9 +137,9 @@
           "Saha": 5632
         },
         "top_actions": [
-          "Alshima and Khozema (AED 0): daily 1:1, close at least AED 3,000 each by Sat 10 Oct and report daily",
-          "Ibrahim, Rihab, Harinder, Chaima: close top-3 pending cases each; target AED 6,000 each for 5-10 Oct",
-          "Escalate red dot / Mona redirects to manager and log reasons for every lost deal (21 in 2 days)"
+          "Alshima and Khozema (AED 0): reach AED 9,000 each by Sat 10 Oct, i.e. AED 1,500 a day; daily check-in",
+          "Chaima, Harinder, Ibrahim, Rihab: reach AED 8,333 each by Sat 10 Oct (gap 6,083 / 5,591 / 7,183 / 7,237)",
+          "Escalate red dot / Mona redirects to manager; Layan (+1,167) and Saha (+2,701) to stay on AED 8,333 pace"
         ]
       },
       "status": "draft"
