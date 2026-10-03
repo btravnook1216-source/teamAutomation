@@ -178,7 +178,8 @@ def fill_form2(week, data):
         v = S.get(k)
         if v not in (None, ''):
             put(doc[6], rect, v, size=10)
-    out = os.path.join(ROOT, 'reports', 'weekly', f'Form2_Case_Log_Week{week}.pdf')
+    sfx = '_DRAFT' if wk.get('status', 'draft') == 'draft' else ''
+    out = os.path.join(ROOT, 'reports', 'weekly', f'Form2_Case_Log_Week{week}{sfx}.pdf')
     os.makedirs(os.path.dirname(out), exist_ok=True)
     doc.save(out)
     return out
@@ -200,7 +201,10 @@ def week_totals(week, data):
 
 
 def money(v):
-    return '' if v in (None, '') else f'{float(v):,.2f}'
+    if v in (None, ''):
+        return ''
+    v = float(v)
+    return f'{int(v):,}' if v.is_integer() else f'{v:,.2f}'
 
 
 def fill_form3(week, data):
@@ -208,8 +212,8 @@ def fill_form3(week, data):
     f3 = wk.get('form3', {})
     doc = pymupdf.open(os.path.join(ROOT, 'forms', 'Form3_Weekly_Report_blank.pdf'))
     p = doc[0]
-    line_text(p, 30, 201.8, 153, data['team_leader'], 10.5, 'hebo')
-    line_text(p, 215.2, 323.2, 153, data['team'], 10, 'hebo')
+    line_text(p, 30, 201.8, 153, f3.get('team_leader', data['team_leader']), 10.5, 'hebo')
+    line_text(p, 215.2, 323.2, 153, f3.get('team', data['team']), 10, 'hebo')
     line_text(p, 336.8, 444, 153, fmt_date(wk['from']), 10.5, 'hebo')
     line_text(p, 457.5, 565.5, 153, fmt_date(wk['to']), 10.5, 'hebo')
     totals = week_totals(week, data)
@@ -226,7 +230,7 @@ def fill_form3(week, data):
         y0, y1 = ys[i], ys[i] + 21
         put(p, (53.2, y0, 298.5, y1), ag, size=9)
         t = targets.get(ag)
-        a = totals.get(ag) if totals else None
+        a = totals.get(ag) if totals else f3.get('agent_achieved', {}).get(ag)
         put(p, (298.5, y0, 396.0, y1), money(t), size=9)
         put(p, (396.0, y0, 493.5, y1), money(a), size=9)
         if t and a is not None:
@@ -236,7 +240,8 @@ def fill_form3(week, data):
         put(p, rect, f3.get(key), size=10)
     for i, ytxt in enumerate(f3.get('top_actions', [])[:3]):
         line_text(p, 40, 566, (648.8, 668.2, 687.8)[i], ytxt, 9)
-    out = os.path.join(ROOT, 'reports', 'weekly', f'Form3_Weekly_Report_Week{week}.pdf')
+    sfx = '_DRAFT' if wk.get('status', 'draft') == 'draft' else ''
+    out = os.path.join(ROOT, 'reports', 'weekly', f'Form3_Weekly_Report_Week{week}{sfx}.pdf')
     os.makedirs(os.path.dirname(out), exist_ok=True)
     doc.save(out)
     return out
